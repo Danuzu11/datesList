@@ -267,8 +267,16 @@
             box-shadow: 0 15px 40px rgba(181, 72, 219, 0.5);
             animation: modalSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             margin: 10px;
+            scrollbar-width: none;       /* Firefox */
+            -ms-overflow-style: none;    /* IE/Edge viejo */
         }
-
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar,
+        .modal-content::-webkit-scrollbar {
+        width: 0 !important;         /* Chrome/Safari/Edge */
+        height: 0 !important;
+        display: none !important;
+        }
         @keyframes modalSlideIn {
             from {
                 opacity: 0;
