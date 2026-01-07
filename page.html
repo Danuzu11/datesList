@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Salidas Pendientes 🐓</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --purple-base: #B548DB;
+            --purple-dark: #8B2FA8;
+            --purple-medium: #B548DB;
+            --purple-light: #D17BF0;
+            --purple-pale: #E5B0F5;
+            --black: #1a1a1a;
+            --white: #fff;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--black) 0%, var(--purple-base) 50%, var(--black) 100%);
+            min-height: 100vh;
+            padding: 15px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animaciones de fondo - Pollos y Gallos */
+        .floating-chicken {
+            position: fixed;
+            font-size: 2.5rem;
+            opacity: 0.15;
+            animation: float 15s infinite ease-in-out;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @media (max-width: 768px) {
+            .floating-chicken {
+                font-size: 2rem;
+                opacity: 0.1;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-50px) rotate(10deg); }
+        }
+
+        .chicken-1 { top: 10%; left: 10%; animation-delay: 0s; }
+        .chicken-2 { top: 30%; right: 15%; animation-delay: 2s; }
+        .chicken-3 { bottom: 20%; left: 20%; animation-delay: 4s; }
+        .chicken-4 { bottom: 40%; right: 10%; animation-delay: 6s; }
+        .chicken-5 { top: 60%; left: 5%; animation-delay: 8s; }
+
+        /* Contenedor principal */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            animation: fadeInDown 1s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            color: var(--white);
+            font-size: 2rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px var(--purple-light);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px var(--purple-light); }
+            to { text-shadow: 0 0 30px var(--purple-pale), 0 0 40px var(--purple-light); }
+        }
+
+        .header p {
+            color: var(--purple-pale);
+            font-size: 0.95rem;
+        }
+
+        /* Botón agregar cita */
+        .add-btn {
+            background: linear-gradient(135deg, var(--purple-medium), var(--purple-light));
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            font-size: 0.9rem;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 15px auto;
+            display: block;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            box-shadow: 0 5px 20px rgba(181, 72, 219, 0.5);
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+            width: auto;
+            max-width: 300px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .add-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 30px rgba(156, 39, 176, 0.6);
+        }
+
+        .add-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Lista de citas */
+        .dates-list {
+            display: grid;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .date-card {
+            background: linear-gradient(135deg, rgba(181, 72, 219, 0.25), rgba(139, 47, 168, 0.35));
+            border: 2px solid var(--purple-medium);
+            border-radius: 15px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            animation: slideIn 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .date-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(181, 72, 219, 0.25) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .date-card:hover::before {
+            opacity: 1;
+        }
+
+        .date-card:hover {
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 10px 30px rgba(181, 72, 219, 0.5);
+            border-color: var(--purple-pale);
+        }
+
+        .date-card:nth-child(1) { animation-delay: 0.1s; }
+        .date-card:nth-child(2) { animation-delay: 0.2s; }
+        .date-card:nth-child(3) { animation-delay: 0.3s; }
+        .date-card:nth-child(4) { animation-delay: 0.4s; }
+        .date-card:nth-child(5) { animation-delay: 0.5s; }
+
+        .date-title {
+            color: var(--white);
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .date-emoji {
+            font-size: 1.5rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-10px) rotate(-5deg); }
+            75% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        .date-card:hover .date-emoji {
+            animation: spin 0.5s ease;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, var(--purple-dark), var(--black));
+            border: 2px solid var(--purple-medium);
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 15px 40px rgba(181, 72, 219, 0.5);
+            animation: modalSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            margin: 10px;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.7) translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            transform: rotate(90deg) scale(1.2);
+            color: var(--purple-pale);
+        }
+
+        .modal-title {
+            color: var(--white);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .modal-section {
+            margin-bottom: 20px;
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .modal-section:nth-child(2) { animation-delay: 0.1s; }
+        .modal-section:nth-child(3) { animation-delay: 0.2s; }
+        .modal-section:nth-child(4) { animation-delay: 0.3s; }
+        .modal-section:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            color: var(--purple-pale);
+            font-size: 1rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid var(--purple-light);
+            padding-bottom: 8px;
+        }
+
+        .section-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .section-list li {
+            color: var(--white);
+            padding: 6px 10px;
+            margin: 5px 0;
+            background: rgba(181, 72, 219, 0.3);
+            border-left: 3px solid var(--purple-medium);
+            border-radius: 6px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .section-list li::before {
+            content: '🐓';
+            font-size: 0.9rem;
+        }
+
+        .section-list li:hover {
+            background: rgba(181, 72, 219, 0.5);
+            transform: translateX(5px);
+            border-left-color: var(--purple-pale);
+        }
+
+        .presupuesto {
+            background: linear-gradient(135deg, var(--purple-medium), var(--purple-light));
+            color: var(--white);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 600;
+            box-shadow: 0 3px 15px rgba(181, 72, 219, 0.4);
+        }
+
+        .edit-btn {
+            background: linear-gradient(135deg, var(--purple-medium), var(--purple-light));
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            margin: 20px auto 0;
+            display: block;
+            box-shadow: 0 3px 15px rgba(181, 72, 219, 0.4);
+            transition: all 0.3s;
+        }
+
+        .edit-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(181, 72, 219, 0.6);
+        }
+
+        /* Formulario agregar cita */
+        .form-modal {
+            display: none;
+        }
+
+        .form-modal.active {
+            display: flex;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            color: var(--purple-pale);
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid var(--purple-light);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .ingredientes-input,
+        .materiales-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .ingredientes-input input,
+        .materiales-input input {
+            flex: 1;
+        }
+
+        .add-item-btn {
+            background: var(--purple-medium);
+            color: var(--white);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .items-list {
+            list-style: none;
+            margin-top: 10px;
+        }
+
+        .items-list li {
+            background: rgba(181, 72, 219, 0.3);
+            padding: 6px 10px;
+            margin: 4px 0;
+            border-radius: 5px;
+            color: var(--white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .remove-item {
+            background: rgba(255, 0, 0, 0.3);
+            border: none;
+            color: var(--white);
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .form-buttons button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, var(--purple-medium), var(--purple-light));
+            color: var(--white);
+        }
+
+        .cancel-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border: 2px solid var(--purple-light);
+        }
+
+        .form-buttons button:hover {
+            transform: scale(1.05);
+        }
+
+        /* Scrollbar personalizado */
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: rgba(156, 39, 176, 0.1);
+            border-radius: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: var(--purple-light);
+            border-radius: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: var(--purple-pale);
+        }
+
+        /* Responsive Design para móviles y Android */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                margin-bottom: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+                line-height: 1.3;
+            }
+
+            .header p {
+                font-size: 0.85rem;
+            }
+            
+            .date-card {
+                padding: 12px;
+                border-radius: 12px;
+            }
+
+            .date-title {
+                font-size: 1rem;
+                gap: 8px;
+            }
+
+            .date-emoji {
+                font-size: 1.3rem;
+            }
+
+            .add-btn {
+                padding: 10px 20px;
+                font-size: 0.85rem;
+                width: 90%;
+                max-width: 280px;
+            }
+
+            .modal-content {
+                padding: 20px 15px;
+                width: 95%;
+                max-width: 95%;
+                border-radius: 15px;
+                margin: 5px;
+            }
+
+            .modal-title {
+                font-size: 1.2rem;
+                margin-bottom: 15px;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+
+            .section-title {
+                font-size: 0.9rem;
+                margin-bottom: 8px;
+            }
+
+            .section-list li {
+                font-size: 0.8rem;
+                padding: 6px 8px;
+                margin: 4px 0;
+            }
+
+            .presupuesto {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+
+            .close-btn {
+                font-size: 1.8rem;
+                top: 8px;
+                right: 12px;
+                width: 30px;
+                height: 30px;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            .form-group label {
+                font-size: 0.85rem;
+            }
+
+            .form-group input,
+            .form-group textarea {
+                padding: 8px 10px;
+                font-size: 0.85rem;
+            }
+
+            .form-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .form-buttons button {
+                width: 100%;
+                padding: 10px;
+            }
+
+            .edit-btn {
+                padding: 8px 16px;
+                font-size: 0.85rem;
+                width: 90%;
+                max-width: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.3rem;
+            }
+
+            .date-card {
+                padding: 10px;
+            }
+
+            .date-title {
+                font-size: 0.95rem;
+            }
+
+            .modal-content {
+                padding: 15px 12px;
+            }
+
+            .modal-title {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Mejoras para Android específicamente */
+        @media screen and (max-width: 768px) and (orientation: portrait) {
+            .modal-content {
+                max-height: 90vh;
+            }
+
+            .dates-list {
+                gap: 15px;
+            }
+        }
+
+        @media screen and (max-width: 768px) and (orientation: landscape) {
+            .header {
+                margin-bottom: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.3rem;
+            }
+
+            .modal-content {
+                max-height: 95vh;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Pollos flotantes de fondo -->
+    <div class="floating-chicken chicken-1">🐓</div>
+    <div class="floating-chicken chicken-2">🐔</div>
+    <div class="floating-chicken chicken-3">🐓</div>
+    <div class="floating-chicken chicken-4">🐔</div>
+    <div class="floating-chicken chicken-5">🐓</div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🐓 Citas 🐔</h1>
+        </div>
+
+        <button class="add-btn" onclick="openAddForm()">
+            ➕ Agregar Nuevo Plan
+        </button>
+
+        <div class="dates-list" id="datesList">
+            <!-- Las citas se cargarán aquí dinámicamente -->
+        </div>
+    </div>
+
+    <!-- Modal para detalles de cita -->
+    <div class="modal" id="dateModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- Modal para agregar nueva cita -->
+    <div class="modal form-modal" id="addFormModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeAddForm()">&times;</button>
+            <div class="modal-title">✨ Nueva Cita Especial ✨</div>
+            
+            <form id="addDateForm">
+                <div class="form-group">
+                    <label>🐔 Título de la Cita</label>
+                    <input type="text" id="newTitle" placeholder="Ej: Picnic en el parque" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Ingredientes</label>
+                    <div class="ingredientes-input">
+                        <input type="text" id="ingredienteInput" placeholder="Agregar ingrediente">
+                        <button type="button" class="add-item-btn" onclick="addItem('ingredienteInput', 'ingredientesList')">+</button>
+                    </div>
+                    <ul class="items-list" id="ingredientesList"></ul>
+                </div>
+
+                <div class="form-group">
+                    <label>Materiales</label>
+                    <div class="materiales-input">
+                        <input type="text" id="materialInput" placeholder="Agregar material">
+                        <button type="button" class="add-item-btn" onclick="addItem('materialInput', 'materialesList')">+</button>
+                    </div>
+                    <ul class="items-list" id="materialesList"></ul>
+                </div>
+
+                <div class="form-group">
+                    <label>💰 Presupuesto</label>
+                    <input type="text" id="newPresupuesto" placeholder="Ej: $50.000 - $80.000">
+                </div>
+
+                <div class="form-group">
+                    <label>Emoji (opcional)</label>
+                    <input type="text" id="newEmoji" placeholder="🌺" maxlength="2">
+                </div>
+
+                <div class="form-buttons">
+                    <button type="submit" class="save-btn">💾 Guardar Cita</button>
+                    <button type="button" class="cancel-btn" onclick="closeAddForm()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Datos JSON embebidos para evitar problemas CORS
+        const defaultDates = [
+          {
+            "id": 1,
+            "title": "Picnic en el Jardín Botánico",
+            "ingredientes": [
+              "Pan artesanal",
+              "Quesos variados",
+              "Frutas frescas (uvas, fresas, manzanas)",
+              "Vino o jugo natural",
+              "Chocolate artesanal",
+              "Galletas caseras"
+            ],
+            "materiales": [
+              "Manta para picnic",
+              "Canasta de mimbre",
+              "Platos y vasos reutilizables",
+              "Cubiertos",
+              "Música portátil",
+              "Cámara para fotos"
+            ],
+            "presupuesto": "$50.000 - $80.000",
+            "emoji": "🌺"
+          },
+          {
+            "id": 2,
+            "title": "Sesión de Cine al Aire Libre",
+            "ingredientes": [
+              "Palomitas caseras",
+              "Bebidas favoritas",
+              "Dulces variados",
+              "Chocolate caliente"
+            ],
+            "materiales": [
+              "Proyector o laptop",
+              "Sábanas blancas o pantalla",
+              "Cojines y mantas",
+              "Luces ambientales",
+              "Bocinas"
+            ],
+            "presupuesto": "$30.000 - $60.000",
+            "emoji": "🎬"
+          },
+          {
+            "id": 3,
+            "title": "Cocinar Juntos una Cena Especial",
+            "ingredientes": [
+              "Ingredientes para pasta casera",
+              "Salsa de tomate natural",
+              "Hierbas frescas",
+              "Vino tinto",
+              "Postre (tiramisú o brownies)"
+            ],
+            "materiales": [
+              "Utensilios de cocina",
+              "Delantal",
+              "Velas y mantel bonito",
+              "Música romántica"
+            ],
+            "presupuesto": "$40.000 - $70.000",
+            "emoji": "🍝"
+          },
+          {
+            "id": 4,
+            "title": "Paseo en Bicicleta al Atardecer",
+            "ingredientes": [
+              "Snacks energéticos",
+              "Agua",
+              "Frutas",
+              "Barras de cereal"
+            ],
+            "materiales": [
+              "Bicicletas",
+              "Cascos",
+              "Cesta para picnic",
+              "Cámara",
+              "Linterna"
+            ],
+            "presupuesto": "$20.000 - $40.000",
+            "emoji": "🚴"
+          }
+        ];
+
+        let dates = [];
+        let nextId = 100; // Para nuevas citas desde localStorage
+
+        // Cargar citas desde JSON (GitHub Pages) o datos embebidos
+        async function loadDates() {
+            try {
+                // Intentar cargar desde dates.json (funciona en GitHub Pages)
+                let jsonDates = null;
+                try {
+                    // En GitHub Pages, el archivo está en la raíz
+                    const response = await fetch('./dates.json');
+                    if (response.ok) {
+                        jsonDates = await response.json();
+                        console.log('JSON cargado desde archivo');
+                    }
+                } catch (fetchError) {
+                    // Si falla, usar datos embebidos
+                    console.log('Usando datos embebidos (fallback)');
+                }
+                
+                // Usar datos del JSON si están disponibles, sino usar los embebidos
+                const baseDates = Array.isArray(jsonDates) && jsonDates.length > 0 ? jsonDates : defaultDates;
+                dates = [...baseDates];
+                
+                // Cargar citas guardadas/editadas en localStorage
+                const savedDates = localStorage.getItem('savedDates');
+                if (savedDates) {
+                    try {
+                        const parsed = JSON.parse(savedDates);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                            // Combinar: mantener citas originales, pero reemplazar con versiones editadas
+                            // y agregar nuevas
+                            const baseIds = new Set(baseDates.map(d => d.id));
+                            const savedIds = new Set(parsed.map(d => d.id));
+                            
+                            // Filtrar citas base que no fueron editadas
+                            dates = baseDates.filter(d => !savedIds.has(d.id));
+                            
+                            // Agregar todas las citas guardadas (incluyen editadas y nuevas)
+                            dates = [...dates, ...parsed];
+                            
+                            // Actualizar nextId
+                            const maxId = Math.max(...dates.map(d => d.id), 0);
+                            nextId = maxId + 1;
+                        }
+                    } catch (e) {
+                        console.error('Error parseando localStorage:', e);
+                        // Si hay error, usar solo las fechas base
+                        if (dates.length > 0) {
+                            nextId = Math.max(...dates.map(d => d.id)) + 1;
+                        }
+                    }
+                } else {
+                    // Si no hay localStorage, actualizar nextId basado en dates base
+                    if (dates.length > 0) {
+                        nextId = Math.max(...dates.map(d => d.id)) + 1;
+                    }
+                }
+                
+                renderDates();
+            } catch (error) {
+                console.error('Error cargando fechas:', error);
+                // En caso de error, intentar desde localStorage
+                const savedDates = localStorage.getItem('savedDates');
+                if (savedDates) {
+                    try {
+                        dates = JSON.parse(savedDates);
+                        if (Array.isArray(dates) && dates.length > 0) {
+                            nextId = Math.max(...dates.map(d => d.id)) + 1;
+                        }
+                    } catch (e) {
+                        console.error('Error parseando localStorage:', e);
+                        dates = defaultDates;
+                        if (dates.length > 0) {
+                            nextId = Math.max(...dates.map(d => d.id)) + 1;
+                        }
+                    }
+                } else {
+                    dates = defaultDates;
+                    if (dates.length > 0) {
+                        nextId = Math.max(...dates.map(d => d.id)) + 1;
+                    }
+                }
+                renderDates();
+            }
+        }
+
+        // Renderizar lista de citas
+        function renderDates() {
+            const datesList = document.getElementById('datesList');
+            datesList.innerHTML = '';
+
+            dates.forEach((date, index) => {
+                const card = document.createElement('div');
+                card.className = 'date-card';
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.innerHTML = `
+                    <div class="date-title">
+                        <span class="date-emoji">${date.emoji || '💕'}</span>
+                        <span>${date.title}</span>
+                    </div>
+                `;
+                card.onclick = () => openModal(date);
+                datesList.appendChild(card);
+            });
+        }
+
+        // Variable global para la cita actual
+        let currentDate = null;
+
+        // Abrir modal con detalles
+        function openModal(date) {
+            currentDate = date;
+            const modal = document.getElementById('dateModal');
+            const content = document.getElementById('modalContent');
+            
+            content.innerHTML = `
+                <div class="modal-title">
+                    <span>${date.emoji || '💕'}</span>
+                    <span>${date.title}</span>
+                </div>
+                
+                <div class="modal-section">
+                    <div class="section-title">
+                        <span>🍽️ Ingredientes</span>
+                    </div>
+                    <ul class="section-list">
+                        ${date.ingredientes.map(ing => `<li>${ing}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <div class="modal-section">
+                    <div class="section-title">
+                        <span>📦 Materiales</span>
+                    </div>
+                    <ul class="section-list">
+                        ${date.materiales.map(mat => `<li>${mat}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <div class="modal-section">
+                    <div class="presupuesto">
+                        💰 Presupuesto: ${date.presupuesto || 'Por definir'}
+                    </div>
+                </div>
+                
+                <button class="edit-btn" onclick="openEditForm(${date.id})">
+                    ✏️ Editar Cita
+                </button>
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        // Cerrar modal
+        function closeModal() {
+            document.getElementById('dateModal').classList.remove('active');
+        }
+
+        // Abrir formulario de agregar
+        function openAddForm() {
+            // Resetear formulario
+            document.getElementById('addDateForm').reset();
+            document.getElementById('ingredientesList').innerHTML = '';
+            document.getElementById('materialesList').innerHTML = '';
+            document.getElementById('addDateForm').dataset.editMode = 'false';
+            document.getElementById('addDateForm').dataset.editId = '';
+            
+            // Cambiar título del modal
+            document.querySelector('#addFormModal .modal-title').textContent = '✨ Nueva Cita Especial ✨';
+            
+            // Cambiar texto del botón
+            const submitBtn = document.querySelector('#addDateForm button[type="submit"]');
+            submitBtn.textContent = '💾 Guardar Cita';
+            
+            document.getElementById('addFormModal').classList.add('active');
+        }
+
+        // Cerrar formulario de agregar
+        function closeAddForm() {
+            document.getElementById('addFormModal').classList.remove('active');
+            document.getElementById('addDateForm').reset();
+            document.getElementById('ingredientesList').innerHTML = '';
+            document.getElementById('materialesList').innerHTML = '';
+            document.getElementById('addDateForm').dataset.editMode = 'false';
+            document.getElementById('addDateForm').dataset.editId = '';
+        }
+
+        // Abrir formulario de edición
+        function openEditForm(dateId) {
+            const date = dates.find(d => d.id === dateId);
+            if (!date) return;
+            
+            // Cerrar el modal de detalles
+            closeModal();
+            
+            // Preparar el formulario
+            document.getElementById('newTitle').value = date.title;
+            document.getElementById('newPresupuesto').value = date.presupuesto || '';
+            document.getElementById('newEmoji').value = date.emoji || '';
+            
+            // Limpiar listas
+            const ingredientesList = document.getElementById('ingredientesList');
+            const materialesList = document.getElementById('materialesList');
+            ingredientesList.innerHTML = '';
+            materialesList.innerHTML = '';
+            
+            // Agregar ingredientes
+            date.ingredientes.forEach(ing => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    ${ing}
+                    <button type="button" class="remove-item" onclick="this.parentElement.remove()">×</button>
+                `;
+                ingredientesList.appendChild(li);
+            });
+            
+            // Agregar materiales
+            date.materiales.forEach(mat => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    ${mat}
+                    <button type="button" class="remove-item" onclick="this.parentElement.remove()">×</button>
+                `;
+                materialesList.appendChild(li);
+            });
+            
+            // Cambiar título del modal
+            document.querySelector('#addFormModal .modal-title').textContent = '✏️ Editar Cita Especial ✨';
+            
+            // Marcar como modo edición
+            document.getElementById('addDateForm').dataset.editMode = 'true';
+            document.getElementById('addDateForm').dataset.editId = dateId;
+            
+            // Cambiar texto del botón
+            const submitBtn = document.querySelector('#addDateForm button[type="submit"]');
+            submitBtn.textContent = '💾 Guardar Cambios';
+            
+            // Abrir modal
+            document.getElementById('addFormModal').classList.add('active');
+        }
+
+        // Agregar item a lista
+        function addItem(inputId, listId) {
+            const input = document.getElementById(inputId);
+            const list = document.getElementById(listId);
+            const value = input.value.trim();
+            
+            if (value) {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    ${value}
+                    <button type="button" class="remove-item" onclick="this.parentElement.remove()">×</button>
+                `;
+                list.appendChild(li);
+                input.value = '';
+            }
+        }
+
+        // Permitir Enter en inputs
+        document.getElementById('ingredienteInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addItem('ingredienteInput', 'ingredientesList');
+            }
+        });
+
+        document.getElementById('materialInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addItem('materialInput', 'materialesList');
+            }
+        });
+
+        // Guardar o editar cita
+        document.getElementById('addDateForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const form = document.getElementById('addDateForm');
+            const isEditMode = form.dataset.editMode === 'true';
+            const editId = parseInt(form.dataset.editId);
+            
+            const ingredientes = Array.from(document.getElementById('ingredientesList').children)
+                .map(li => li.textContent.replace('×', '').trim());
+            
+            const materiales = Array.from(document.getElementById('materialesList').children)
+                .map(li => li.textContent.replace('×', '').trim());
+            
+            if (isEditMode) {
+                // Editar cita existente
+                const dateIndex = dates.findIndex(d => d.id === editId);
+                if (dateIndex !== -1) {
+                    // Actualizar la cita
+                    dates[dateIndex] = {
+                        ...dates[dateIndex],
+                        title: document.getElementById('newTitle').value,
+                        ingredientes: ingredientes.length > 0 ? ingredientes : ['Por definir'],
+                        materiales: materiales.length > 0 ? materiales : ['Por definir'],
+                        presupuesto: document.getElementById('newPresupuesto').value || 'Por definir',
+                        emoji: document.getElementById('newEmoji').value || '💕'
+                    };
+                    
+                    // Actualizar localStorage
+                    // Separar citas originales (defaultDates) de las guardadas
+                    const savedDates = JSON.parse(localStorage.getItem('savedDates') || '[]');
+                    
+                    // Si la cita editada es de las guardadas, actualizarla
+                    const savedIndex = savedDates.findIndex(d => d.id === editId);
+                    if (savedIndex !== -1) {
+                        savedDates[savedIndex] = dates[dateIndex];
+                        localStorage.setItem('savedDates', JSON.stringify(savedDates));
+                    } else {
+                        // Si era una cita por defecto, agregarla a savedDates para mantener cambios
+                        savedDates.push(dates[dateIndex]);
+                        localStorage.setItem('savedDates', JSON.stringify(savedDates));
+                    }
+                    
+                    renderDates();
+                    closeAddForm();
+                    alert('🐓 ¡Cita actualizada exitosamente! 🐔');
+                }
+            } else {
+                // Agregar nueva cita
+                const newDate = {
+                    id: nextId++,
+                    title: document.getElementById('newTitle').value,
+                    ingredientes: ingredientes.length > 0 ? ingredientes : ['Por definir'],
+                    materiales: materiales.length > 0 ? materiales : ['Por definir'],
+                    presupuesto: document.getElementById('newPresupuesto').value || 'Por definir',
+                    emoji: document.getElementById('newEmoji').value || '💕'
+                };
+                
+                // Guardar en localStorage
+                const savedDates = JSON.parse(localStorage.getItem('savedDates') || '[]');
+                savedDates.push(newDate);
+                localStorage.setItem('savedDates', JSON.stringify(savedDates));
+                
+                // Agregar a la lista actual
+                dates.push(newDate);
+                renderDates();
+                
+                // Cerrar formulario
+                closeAddForm();
+                
+                // Mostrar mensaje de éxito
+                alert('🐓 ¡Cita agregada exitosamente! 🐔');
+            }
+        });
+
+        // Cerrar modal al hacer click fuera
+        window.onclick = function(event) {
+            const dateModal = document.getElementById('dateModal');
+            const formModal = document.getElementById('addFormModal');
+            if (event.target === dateModal) {
+                closeModal();
+            }
+            if (event.target === formModal) {
+                closeAddForm();
+            }
+        }
+
+        // Cargar citas al iniciar
+        loadDates();
+    </script>
+</body>
+</html>
+

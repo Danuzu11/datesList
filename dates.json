@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "title": "Picnic en el Jardín Botánico",
+    "ingredientes": [
+      "Pan artesanal",
+      "Quesos variados",
+      "Frutas frescas (uvas, fresas, manzanas)",
+      "Vino o jugo natural",
+      "Chocolate artesanal",
+      "Galletas caseras"
+    ],
+    "materiales": [
+      "Manta para picnic",
+      "Canasta de mimbre",
+      "Platos y vasos reutilizables",
+      "Cubiertos",
+      "Música portátil",
+      "Cámara para fotos"
+    ],
+    "presupuesto": "$50.000 - $80.000",
+    "emoji": "🌺"
+  },
+  {
+    "id": 2,
+    "title": "Sesión de Cine al Aire Libre",
+    "ingredientes": [
+      "Palomitas caseras",
+      "Bebidas favoritas",
+      "Dulces variados",
+      "Chocolate caliente"
+    ],
+    "materiales": [
+      "Proyector o laptop",
+      "Sábanas blancas o pantalla",
+      "Cojines y mantas",
+      "Luces ambientales",
+      "Bocinas"
+    ],
+    "presupuesto": "$30.000 - $60.000",
+    "emoji": "🎬"
+  },
+  {
+    "id": 3,
+    "title": "Cocinar Juntos una Cena Especial",
+    "ingredientes": [
+      "Ingredientes para pasta casera",
+      "Salsa de tomate natural",
+      "Hierbas frescas",
+      "Vino tinto",
+      "Postre (tiramisú o brownies)"
+    ],
+    "materiales": [
+      "Utensilios de cocina",
+      "Delantal",
+      "Velas y mantel bonito",
+      "Música romántica"
+    ],
+    "presupuesto": "$40.000 - $70.000",
+    "emoji": "🍝"
+  },
+  {
+    "id": 4,
+    "title": "Paseo en Bicicleta al Atardecer",
+    "ingredientes": [
+      "Snacks energéticos",
+      "Agua",
+      "Frutas",
+      "Barras de cereal"
+    ],
+    "materiales": [
+      "Bicicletas",
+      "Cascos",
+      "Cesta para picnic",
+      "Cámara",
+      "Linterna"
+    ],
+    "presupuesto": "$20.000 - $40.000",
+    "emoji": "🚴"
+  }
+]
+
