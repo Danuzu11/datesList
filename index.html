@@ -408,6 +408,34 @@
             box-shadow: 0 5px 20px rgba(181, 72, 219, 0.6);
         }
 
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .delete-btn {
+            background: rgba(255, 59, 48, 0.18);
+            color: var(--white);
+            border: 1px solid rgba(255, 59, 48, 0.65);
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            box-shadow: 0 3px 15px rgba(255, 59, 48, 0.25);
+            transition: all 0.3s;
+        }
+
+        .delete-btn:hover {
+            transform: scale(1.05);
+            background: rgba(255, 59, 48, 0.28);
+            box-shadow: 0 5px 20px rgba(255, 59, 48, 0.35);
+        }
+
         /* Formulario agregar cita */
         .form-modal {
             display: none;
@@ -660,6 +688,18 @@
                 width: 90%;
                 max-width: 200px;
             }
+
+            .modal-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .delete-btn {
+                padding: 8px 16px;
+                font-size: 0.85rem;
+                width: 90%;
+                max-width: 200px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -745,12 +785,12 @@
     <div class="modal form-modal" id="addFormModal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeAddForm()">&times;</button>
-            <div class="modal-title">✨ Nueva Cita Especial ✨</div>
+            <div class="modal-title">✨ Nuevo Plan Mañoso ✨</div>
             
             <form id="addDateForm">
                 <div class="form-group">
-                    <label>🐔 Título de la Cita</label>
-                    <input type="text" id="newTitle" placeholder="Ej: Picnic en el parque" required>
+                    <label>🐔 Título</label>
+                    <input type="text" id="newTitle" placeholder="Agregar titulo" required>
                 </div>
 
                 <div class="form-group">
@@ -773,12 +813,7 @@
 
                 <div class="form-group">
                     <label>💰 Presupuesto</label>
-                    <input type="text" id="newPresupuesto" placeholder="Ej: $50.000 - $80.000">
-                </div>
-
-                <div class="form-group">
-                    <label>Emoji (opcional)</label>
-                    <input type="text" id="newEmoji" placeholder="🌺" maxlength="2">
+                    <input type="text" id="newPresupuesto" placeholder="$10 - $20">
                 </div>
 
                 <div class="form-buttons">
@@ -790,174 +825,115 @@
     </div>
 
     <script>
-        // Datos JSON embebidos para evitar problemas CORS
-        const defaultDates = [
-          {
-            "id": 1,
-            "title": "Picnic en el Jardín Botánico",
-            "ingredientes": [
-              "Pan artesanal",
-              "Quesos variados",
-              "Frutas frescas (uvas, fresas, manzanas)",
-              "Vino o jugo natural",
-              "Chocolate artesanal",
-              "Galletas caseras"
-            ],
-            "materiales": [
-              "Manta para picnic",
-              "Canasta de mimbre",
-              "Platos y vasos reutilizables",
-              "Cubiertos",
-              "Música portátil",
-              "Cámara para fotos"
-            ],
-            "presupuesto": "$50.000 - $80.000",
-            "emoji": "🌺"
-          },
-          {
-            "id": 2,
-            "title": "Sesión de Cine al Aire Libre",
-            "ingredientes": [
-              "Palomitas caseras",
-              "Bebidas favoritas",
-              "Dulces variados",
-              "Chocolate caliente"
-            ],
-            "materiales": [
-              "Proyector o laptop",
-              "Sábanas blancas o pantalla",
-              "Cojines y mantas",
-              "Luces ambientales",
-              "Bocinas"
-            ],
-            "presupuesto": "$30.000 - $60.000",
-            "emoji": "🎬"
-          },
-          {
-            "id": 3,
-            "title": "Cocinar Juntos una Cena Especial",
-            "ingredientes": [
-              "Ingredientes para pasta casera",
-              "Salsa de tomate natural",
-              "Hierbas frescas",
-              "Vino tinto",
-              "Postre (tiramisú o brownies)"
-            ],
-            "materiales": [
-              "Utensilios de cocina",
-              "Delantal",
-              "Velas y mantel bonito",
-              "Música romántica"
-            ],
-            "presupuesto": "$40.000 - $70.000",
-            "emoji": "🍝"
-          },
-          {
-            "id": 4,
-            "title": "Paseo en Bicicleta al Atardecer",
-            "ingredientes": [
-              "Snacks energéticos",
-              "Agua",
-              "Frutas",
-              "Barras de cereal"
-            ],
-            "materiales": [
-              "Bicicletas",
-              "Cascos",
-              "Cesta para picnic",
-              "Cámara",
-              "Linterna"
-            ],
-            "presupuesto": "$20.000 - $40.000",
-            "emoji": "🚴"
-          }
-        ];
+        // ============================================
+        // CONFIGURACIÓN JSONBIN - Datos compartidos online
+        // ============================================
+        const JSONBIN_BIN_ID = '695dfdb6ae596e708fca7a24';
+        const JSONBIN_API_KEY = '$2a$10$8rL1Cop5QdfFHG6fKyjdiugUrJEAOr9A8dihgWe1DfJziH3eRNIPS';
+        const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
 
         let dates = [];
-        let nextId = 100; // Para nuevas citas desde localStorage
+        let nextId = 100;
+        let isLoading = false;
 
-        // Cargar citas desde JSON (GitHub Pages) o datos embebidos
+        // Emojis aleatorios para las citas
+        const randomEmojis = ['💕', '❤️', '💜', '🌺', '🌸', '🌹', '🎬', '🍝', '🚴', '🎨', '🎭', '🎪', '🎡', '🎢', '🎠', '🎯', '🎲', '🎮', '🎸', '🎹', '🎺', '🎻', '🥁', '🎤', '🎧', '🎼', '🍕', '🍔', '🍟', '🍿', '🧁', '🍰', '🎂', '🍪', '🍩', '🍦', '🍨', '🧃', '🥤', '☕', '🍵', '🌮', '🌯', '🥙', '🥗', '🍱', '🍜', '🍲', '🥘', '🍛', '🍣', '🍤', '🦞', '🦀', '🐙', '🦑', '🌭', '🥪', '🥖', '🥐', '🥯', '🧀', '🥚', '🥓', '🥩', '🍗', '🍖', '🦴', '🌶️', '🫑', '🥒', '🥬', '🥦', '🧄', '🧅', '🍄', '🥜', '🌰', '🍞', '🥨', '🥞', '🧇', '🧈', '🍯'];
+        
+        // Función para obtener emoji aleatorio
+        function getRandomEmoji() {
+            return randomEmojis[Math.floor(Math.random() * randomEmojis.length)];
+        }
+
+        // Mostrar estado de carga
+        function showLoading(message = 'Cargando...') {
+            const datesList = document.getElementById('datesList');
+            datesList.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: var(--purple-pale);">
+                    <div style="font-size: 2rem; animation: spin 1s linear infinite;">🐓</div>
+                    <p style="margin-top: 10px;">${message}</p>
+                </div>
+            `;
+        }
+
+        // Cargar citas desde JSONBin
         async function loadDates() {
+            if (isLoading) return;
+            isLoading = true;
+            showLoading('Cargando citas...');
+            
             try {
-                // Intentar cargar desde dates.json (funciona en GitHub Pages)
-                let jsonDates = null;
-                try {
-                    // En GitHub Pages, el archivo está en la raíz
-                    const response = await fetch('./dates.json');
-                    if (response.ok) {
-                        jsonDates = await response.json();
-                        console.log('JSON cargado desde archivo');
+                const response = await fetch(`${JSONBIN_URL}/latest`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Access-Key': JSONBIN_API_KEY
                     }
-                } catch (fetchError) {
-                    // Si falla, usar datos embebidos
-                    console.log('Usando datos embebidos (fallback)');
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
                 }
                 
-                // Usar datos del JSON si están disponibles, sino usar los embebidos
-                const baseDates = Array.isArray(jsonDates) && jsonDates.length > 0 ? jsonDates : defaultDates;
-                dates = [...baseDates];
+                const data = await response.json();
+                dates = data.record || [];
                 
-                // Cargar citas guardadas/editadas en localStorage
-                const savedDates = localStorage.getItem('savedDates');
-                if (savedDates) {
-                    try {
-                        const parsed = JSON.parse(savedDates);
-                        if (Array.isArray(parsed) && parsed.length > 0) {
-                            // Combinar: mantener citas originales, pero reemplazar con versiones editadas
-                            // y agregar nuevas
-                            const baseIds = new Set(baseDates.map(d => d.id));
-                            const savedIds = new Set(parsed.map(d => d.id));
-                            
-                            // Filtrar citas base que no fueron editadas
-                            dates = baseDates.filter(d => !savedIds.has(d.id));
-                            
-                            // Agregar todas las citas guardadas (incluyen editadas y nuevas)
-                            dates = [...dates, ...parsed];
-                            
-                            // Actualizar nextId
-                            const maxId = Math.max(...dates.map(d => d.id), 0);
-                            nextId = maxId + 1;
-                        }
-                    } catch (e) {
-                        console.error('Error parseando localStorage:', e);
-                        // Si hay error, usar solo las fechas base
-                        if (dates.length > 0) {
-                            nextId = Math.max(...dates.map(d => d.id)) + 1;
-                        }
-                    }
-                } else {
-                    // Si no hay localStorage, actualizar nextId basado en dates base
-                    if (dates.length > 0) {
-                        nextId = Math.max(...dates.map(d => d.id)) + 1;
-                    }
+                // Asegurar que dates sea un array
+                if (!Array.isArray(dates)) {
+                    dates = [];
                 }
                 
+                // Asignar emojis aleatorios a las citas que no tengan
+                dates = dates.map(date => ({
+                    ...date,
+                    emoji: date.emoji || getRandomEmoji()
+                }));
+                
+                // Calcular nextId
+                if (dates.length > 0) {
+                    nextId = Math.max(...dates.map(d => d.id || 0)) + 1;
+                }
+                
+                console.log('✅ Citas cargadas desde JSONBin:', dates.length);
                 renderDates();
             } catch (error) {
-                console.error('Error cargando fechas:', error);
-                // En caso de error, intentar desde localStorage
-                const savedDates = localStorage.getItem('savedDates');
-                if (savedDates) {
-                    try {
-                        dates = JSON.parse(savedDates);
-                        if (Array.isArray(dates) && dates.length > 0) {
-                            nextId = Math.max(...dates.map(d => d.id)) + 1;
-                        }
-                    } catch (e) {
-                        console.error('Error parseando localStorage:', e);
-                        dates = defaultDates;
-                        if (dates.length > 0) {
-                            nextId = Math.max(...dates.map(d => d.id)) + 1;
-                        }
-                    }
-                } else {
-                    dates = defaultDates;
-                    if (dates.length > 0) {
-                        nextId = Math.max(...dates.map(d => d.id)) + 1;
-                    }
-                }
+                console.error('❌ Error cargando desde JSONBin:', error);
+                dates = [];
                 renderDates();
+                showError('Error al cargar las citas. Verifica tu conexión.');
+            } finally {
+                isLoading = false;
             }
+        }
+
+        // Guardar citas en JSONBin
+        async function saveDates() {
+            try {
+                showLoading('Guardando...');
+                
+                const response = await fetch(JSONBIN_URL, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Access-Key': JSONBIN_API_KEY
+                    },
+                    body: JSON.stringify(dates)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
+                console.log('✅ Citas guardadas en JSONBin');
+                return true;
+            } catch (error) {
+                console.error('❌ Error guardando en JSONBin:', error);
+                showError('Error al guardar. Intenta de nuevo.');
+                return false;
+            }
+        }
+
+        // Mostrar mensaje de error
+        function showError(message) {
+            alert(`❌ ${message}`);
         }
 
         // Renderizar lista de citas
@@ -965,13 +941,27 @@
             const datesList = document.getElementById('datesList');
             datesList.innerHTML = '';
 
+            if (dates.length === 0) {
+                datesList.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--purple-pale);">
+                        <div style="font-size: 3rem;">🐓</div>
+                        <p style="margin-top: 10px;">No hay citas aún. ¡Agrega una nueva!</p>
+                    </div>
+                `;
+                return;
+            }
+
             dates.forEach((date, index) => {
                 const card = document.createElement('div');
                 card.className = 'date-card';
                 card.style.animationDelay = `${index * 0.1}s`;
+                
+                // Usar emoji aleatorio si no tiene uno asignado
+                const emoji = date.emoji || getRandomEmoji();
+                
                 card.innerHTML = `
                     <div class="date-title">
-                        <span class="date-emoji">${date.emoji || '💕'}</span>
+                        <span class="date-emoji">${emoji}</span>
                         <span>${date.title}</span>
                     </div>
                 `;
@@ -989,9 +979,12 @@
             const modal = document.getElementById('dateModal');
             const content = document.getElementById('modalContent');
             
+            // Usar emoji aleatorio si no tiene uno
+            const emoji = date.emoji || getRandomEmoji();
+            
             content.innerHTML = `
                 <div class="modal-title">
-                    <span>${date.emoji || '💕'}</span>
+                    <span>${emoji}</span>
                     <span>${date.title}</span>
                 </div>
                 
@@ -1018,13 +1011,43 @@
                         💰 Presupuesto: ${date.presupuesto || 'Por definir'}
                     </div>
                 </div>
-                
-                <button class="edit-btn" onclick="openEditForm(${date.id})">
-                    ✏️ Editar Cita
-                </button>
+
+                <div class="modal-actions">
+                    <button class="edit-btn" onclick="openEditForm(${date.id})">
+                        ✏️ Editar
+                    </button>
+                    <button class="delete-btn" onclick="deleteDate(${date.id})" title="Eliminar">
+                        ✖ Eliminar
+                    </button>
+                </div>
             `;
             
             modal.classList.add('active');
+        }
+
+        // Eliminar cita
+        async function deleteDate(dateId) {
+            const date = dates.find(d => d.id === dateId);
+            if (!date) return;
+
+            const ok = confirm(`¿Eliminar este plan?\n\n"${date.title}"\n\nEsto se borrará para ambos (JSONBin).`);
+            if (!ok) return;
+
+            const prevDates = [...dates];
+            dates = dates.filter(d => d.id !== dateId);
+
+            const saved = await saveDates();
+            if (saved) {
+                closeModal();
+                renderDates();
+                alert('✅ Plan eliminado');
+                return;
+            }
+
+            // Si falló, restaurar y recargar desde el bin para quedar consistentes
+            dates = prevDates;
+            renderDates();
+            await loadDates();
         }
 
         // Cerrar modal
@@ -1042,7 +1065,7 @@
             document.getElementById('addDateForm').dataset.editId = '';
             
             // Cambiar título del modal
-            document.querySelector('#addFormModal .modal-title').textContent = '✨ Nueva Cita Especial ✨';
+            document.querySelector('#addFormModal .modal-title').textContent = '✨ Nuevo Plan Mañoso ✨';
             
             // Cambiar texto del botón
             const submitBtn = document.querySelector('#addDateForm button[type="submit"]');
@@ -1072,7 +1095,6 @@
             // Preparar el formulario
             document.getElementById('newTitle').value = date.title;
             document.getElementById('newPresupuesto').value = date.presupuesto || '';
-            document.getElementById('newEmoji').value = date.emoji || '';
             
             // Limpiar listas
             const ingredientesList = document.getElementById('ingredientesList');
@@ -1101,7 +1123,7 @@
             });
             
             // Cambiar título del modal
-            document.querySelector('#addFormModal .modal-title').textContent = '✏️ Editar Cita Especial ✨';
+            document.querySelector('#addFormModal .modal-title').textContent = '✏️ Editar Plan ✨';
             
             // Marcar como modo edición
             document.getElementById('addDateForm').dataset.editMode = 'true';
@@ -1148,7 +1170,7 @@
         });
 
         // Guardar o editar cita
-        document.getElementById('addDateForm').addEventListener('submit', (e) => {
+        document.getElementById('addDateForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const form = document.getElementById('addDateForm');
@@ -1172,53 +1194,45 @@
                         ingredientes: ingredientes.length > 0 ? ingredientes : ['Por definir'],
                         materiales: materiales.length > 0 ? materiales : ['Por definir'],
                         presupuesto: document.getElementById('newPresupuesto').value || 'Por definir',
-                        emoji: document.getElementById('newEmoji').value || '💕'
+                        emoji: dates[dateIndex].emoji || getRandomEmoji()
                     };
                     
-                    // Actualizar localStorage
-                    // Separar citas originales (defaultDates) de las guardadas
-                    const savedDates = JSON.parse(localStorage.getItem('savedDates') || '[]');
-                    
-                    // Si la cita editada es de las guardadas, actualizarla
-                    const savedIndex = savedDates.findIndex(d => d.id === editId);
-                    if (savedIndex !== -1) {
-                        savedDates[savedIndex] = dates[dateIndex];
-                        localStorage.setItem('savedDates', JSON.stringify(savedDates));
+                    // Guardar en JSONBin
+                    const saved = await saveDates();
+                    if (saved) {
+                        renderDates();
+                        closeAddForm();
+                        alert('🐓 ¡Cita actualizada exitosamente! 🐔');
                     } else {
-                        // Si era una cita por defecto, agregarla a savedDates para mantener cambios
-                        savedDates.push(dates[dateIndex]);
-                        localStorage.setItem('savedDates', JSON.stringify(savedDates));
+                        renderDates();
                     }
-                    
-                    renderDates();
-                    closeAddForm();
-                    alert('🐓 ¡Cita actualizada exitosamente! 🐔');
                 }
             } else {
-                // Agregar nueva cita
+                // Agregar nueva cita con emoji aleatorio
                 const newDate = {
                     id: nextId++,
                     title: document.getElementById('newTitle').value,
                     ingredientes: ingredientes.length > 0 ? ingredientes : ['Por definir'],
                     materiales: materiales.length > 0 ? materiales : ['Por definir'],
                     presupuesto: document.getElementById('newPresupuesto').value || 'Por definir',
-                    emoji: document.getElementById('newEmoji').value || '💕'
+                    emoji: getRandomEmoji()
                 };
-                
-                // Guardar en localStorage
-                const savedDates = JSON.parse(localStorage.getItem('savedDates') || '[]');
-                savedDates.push(newDate);
-                localStorage.setItem('savedDates', JSON.stringify(savedDates));
                 
                 // Agregar a la lista actual
                 dates.push(newDate);
-                renderDates();
                 
-                // Cerrar formulario
-                closeAddForm();
-                
-                // Mostrar mensaje de éxito
-                alert('🐓 ¡Cita agregada exitosamente! 🐔');
+                // Guardar en JSONBin
+                const saved = await saveDates();
+                if (saved) {
+                    renderDates();
+                    closeAddForm();
+                    alert('🐓 ¡Cita agregada exitosamente! 🐔');
+                } else {
+                    // Si falla, quitar la cita agregada
+                    dates.pop();
+                    nextId--;
+                    renderDates();
+                }
             }
         });
 
