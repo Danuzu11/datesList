@@ -199,6 +199,20 @@
         .date-card:nth-child(4) { animation-delay: 0.4s; }
         .date-card:nth-child(5) { animation-delay: 0.5s; }
 
+        .date-card.completed {
+            background: linear-gradient(135deg, rgba(76, 217, 100, 0.35), rgba(56, 180, 80, 0.45));
+            border-color: rgba(76, 217, 100, 0.7);
+        }
+
+        .date-card.completed:hover {
+            box-shadow: 0 10px 30px rgba(76, 217, 100, 0.4);
+            border-color: rgba(76, 217, 100, 0.9);
+        }
+
+        .date-card.completed::before {
+            background: radial-gradient(circle, rgba(76, 217, 100, 0.2) 0%, transparent 70%);
+        }
+
         .date-title {
             color: var(--white);
             font-size: 1.1rem;
@@ -442,6 +456,36 @@
             transform: scale(1.05);
             background: rgba(255, 59, 48, 0.28);
             box-shadow: 0 5px 20px rgba(255, 59, 48, 0.35);
+        }
+
+        .complete-btn {
+            background: rgba(76, 217, 100, 0.25);
+            color: var(--white);
+            border: 1px solid rgba(76, 217, 100, 0.6);
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            box-shadow: 0 3px 15px rgba(76, 217, 100, 0.25);
+            transition: all 0.3s;
+        }
+
+        .complete-btn:hover {
+            transform: scale(1.05);
+            background: rgba(76, 217, 100, 0.35);
+            box-shadow: 0 5px 20px rgba(76, 217, 100, 0.4);
+        }
+
+        .completed-badge {
+            background: rgba(76, 217, 100, 0.3);
+            color: var(--white);
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            border-radius: 20px;
+            font-weight: 600;
+            border: 1px solid rgba(76, 217, 100, 0.6);
         }
 
         /* Formulario agregar cita */
@@ -889,10 +933,11 @@
                     dates = [];
                 }
                 
-                // Asignar emojis aleatorios a las citas que no tengan
+                // Asignar emojis y completed por defecto
                 dates = dates.map(date => ({
                     ...date,
-                    emoji: date.emoji || getRandomEmoji()
+                    emoji: date.emoji || getRandomEmoji(),
+                    completed: date.completed === true
                 }));
                 
                 // Calcular nextId
@@ -961,7 +1006,7 @@
 
             dates.forEach((date, index) => {
                 const card = document.createElement('div');
-                card.className = 'date-card';
+                card.className = 'date-card' + (date.completed ? ' completed' : '');
                 card.style.animationDelay = `${index * 0.1}s`;
                 
                 // Usar emoji aleatorio si no tiene uno asignado
@@ -1021,6 +1066,13 @@
                 </div>
 
                 <div class="modal-actions">
+                    ${date.completed ? `
+                    <span class="completed-badge">✓ Completado</span>
+                    ` : `
+                    <button class="complete-btn" onclick="completeDate(${date.id})" title="Marcar como completado">
+                        ✓ Completar
+                    </button>
+                    `}
                     <button class="edit-btn" onclick="openEditForm(${date.id})">
                         ✏️ Editar
                     </button>
@@ -1056,6 +1108,23 @@
             dates = prevDates;
             renderDates();
             await loadDates();
+        }
+
+        // Marcar cita como completada
+        async function completeDate(dateId) {
+            const date = dates.find(d => d.id === dateId);
+            if (!date) return;
+
+            date.completed = true;
+            const saved = await saveDates();
+            if (saved) {
+                openModal(date);
+                renderDates();
+                alert('✅ Plan marcado como completado');
+            } else {
+                date.completed = false;
+                await loadDates();
+            }
         }
 
         // Cerrar modal
@@ -1202,7 +1271,8 @@
                         ingredientes: ingredientes.length > 0 ? ingredientes : ['Por definir'],
                         materiales: materiales.length > 0 ? materiales : ['Por definir'],
                         presupuesto: document.getElementById('newPresupuesto').value || 'Por definir',
-                        emoji: dates[dateIndex].emoji || getRandomEmoji()
+                        emoji: dates[dateIndex].emoji || getRandomEmoji(),
+                        completed: dates[dateIndex].completed === true
                     };
                     
                     // Guardar en JSONBin
@@ -1223,7 +1293,8 @@
                     ingredientes: ingredientes.length > 0 ? ingredientes : ['Por definir'],
                     materiales: materiales.length > 0 ? materiales : ['Por definir'],
                     presupuesto: document.getElementById('newPresupuesto').value || 'Por definir',
-                    emoji: getRandomEmoji()
+                    emoji: getRandomEmoji(),
+                    completed: false
                 };
                 
                 // Agregar a la lista actual
